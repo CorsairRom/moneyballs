@@ -1,5 +1,6 @@
-import { defineStore } from '#q-app/wrappers'
-import { createPinia } from 'pinia'
+import { defineStore } from '#q-app/wrappers';
+import { createPinia } from 'pinia';
+import piniaPluginPersistedState from 'pinia-plugin-persistedstate';
 
 /*
  * When adding new properties to stores, you should also
@@ -22,11 +23,13 @@ declare module 'pinia' {
  * with the Store instance.
  */
 
-export default defineStore((/* { ssrContext } */) => {
-  const pinia = createPinia()
+export default defineStore(
+  (/* { ssrContext } */) => {
+    const pinia = createPinia();
+    pinia.use(piniaPluginPersistedState);
+    // You can add Pinia plugins here
+    // pinia.use(SomePiniaPlugin)
 
-  // You can add Pinia plugins here
-  // pinia.use(SomePiniaPlugin)
-
-  return pinia
-})
+    return pinia;
+  },
+);

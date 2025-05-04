@@ -1,0 +1,14 @@
+{
+  "name": "moneyballs",
+  "version": "0.0.1",
+  "description": "app to control expenses",
+  "author": "rromero <rromero@heligrafics.net>",
+  "private": true,
+  "dependencies": {
+    "@capacitor/android": "^7.0.0",
+    "@capacitor/app": "^7.0.0",
+    "@capacitor/cli": "^7.0.0",
+    "@capacitor/core": "^7.0.0",
+    "@capacitor/keyboard": "^7.0.1"
+  }
+}

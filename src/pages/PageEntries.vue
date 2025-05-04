@@ -3,10 +3,8 @@
     <div class="q-pa-md">
       <q-list bordered padding separator>
         <q-slide-item
-          @right="
-            onEntrySlideRight($event, entry)
-          "
-          v-for="entry in entries"
+          @right="onEntrySlideRight($event, entry)"
+          v-for="entry in localEntries"
           :key="entry.id"
           left-color="positive"
           right-color="negative"
@@ -16,21 +14,14 @@
           </template>
 
           <q-item>
-            <q-item-section
-              class="text-weight-bold"
-              :class="
-                useAmountColorClass(entry.amount)
-              "
-            >
+            <q-item-section class="text-weight-bold" :class="useAmountColorClass(entry.amount)">
               {{ entry.name }}
             </q-item-section>
 
             <q-item-section
               side
               class="text-weight-bold"
-              :class="
-                useAmountColorClass(entry.amount)
-              "
+              :class="useAmountColorClass(entry.amount)"
             >
               {{ useCurrencify(entry.amount) }}
             </q-item-section>
@@ -39,23 +30,13 @@
       </q-list>
     </div>
     <q-footer class="bg-transparent">
-      <div
-        class="row q-mb-sm q-px-md q-py-sm shadow-up-3"
-      >
-        <div class="col text-grey-7 text-h6">
-          Balance:
-        </div>
-        <div
-          :class="useAmountColorClass(balance)"
-          class="col text-h6 text-right"
-        >
+      <div class="row q-mb-sm q-px-md q-py-sm shadow-up-3">
+        <div class="col text-grey-7 text-h6">Balance:</div>
+        <div :class="useAmountColorClass(balance)" class="col text-h6 text-right">
           {{ useCurrencify(balance) }}
         </div>
       </div>
-      <q-form
-        @submit="onAddEntry"
-        class="row q-px-sm q-pb-sm q-col-gutter-sm bg-primary"
-      >
+      <q-form @submit="onAddEntry" class="row q-px-sm q-pb-sm q-col-gutter-sm bg-primary">
         <div class="col">
           <q-input
             placeholder="Nombre del gasto"
@@ -78,12 +59,7 @@
           />
         </div>
         <div class="col">
-          <q-btn
-            type="submit"
-            round
-            color="primary"
-            icon="add"
-          />
+          <q-btn type="submit" round color="primary" icon="add" />
         </div>
       </q-form>
     </q-footer>
@@ -95,50 +71,24 @@ import { ref, computed, reactive } from 'vue';
 import { useCurrencify } from 'src/use/useCurrencify';
 import { useAmountColorClass } from 'src/use/useAmountColorClass';
 import { uid, useQuasar } from 'quasar';
+import { useEntriesStore } from 'src/stores/example-store';
+
 const $q = useQuasar();
-//PENSAR EN PONER FECHAS
-const entries = ref([
-  {
-    id: 'id1',
-    name: 'Salary',
-    amount: 1657000,
-  },
-  {
-    id: 'id2',
-    name: 'Arriendo',
-    amount: -2000000,
-  },
-  {
-    id: 'id3',
-    name: 'Luz',
-    amount: -34500,
-  },
-  {
-    id: 'id4',
-    name: 'Agua',
-    amount: -23450,
-  },
-  {
-    id: 'id5',
-    name: 'Desconocido',
-    amount: 0,
-  },
-]);
 
-const nameRef = ref<HTMLInputElement | null>(
-  null,
-);
+// store
+const entriesStore = useEntriesStore();
+
+// reactive list from store
+const localEntries = computed(() => entriesStore.entries);
+
+const nameRef = ref<HTMLInputElement | null>(null);
+
 // balance
-
 const balance = computed(() => {
-  return entries.value.reduce(
-    (acc, entry) => acc + entry.amount,
-    0,
-  );
+  return localEntries.value.reduce((acc, entry) => acc + entry.amount, 0);
 });
 
-// entries
-
+// form
 const addEntryDefault = {
   name: '',
   amount: 0,
@@ -156,14 +106,16 @@ const resetAddEntryForm = () => {
 };
 
 const onAddEntry = () => {
-  entries.value.push({
+  const newEntry = {
     id: uid(),
     name: addEntryForm.name,
     amount: addEntryForm.amount,
-  });
+  };
+
+  entriesStore.addEntry(newEntry);
   resetAddEntryForm();
 };
-//delete entry
+
 interface Entry {
   id: string;
   name: string;
@@ -200,22 +152,15 @@ const onEntrySlideRight = (
     },
   })
     .onOk(() => {
-      // console.log('OK')
       deleteEntry(entry.id);
       reset();
     })
     .onCancel(() => {
-      // console.log('Cancel')
       reset();
     });
 
   const deleteEntry = (entryID: string) => {
-    const index = entries.value.findIndex(
-      (e) => e.id === entryID,
-    );
-    if (index !== -1) {
-      entries.value.splice(index, 1);
-    }
+    entriesStore.entries = entriesStore.entries.filter((e) => e.id !== entryID);
     $q.notify({
       type: 'negative',
       message: `Gasto eliminado`,
@@ -223,13 +168,4 @@ const onEntrySlideRight = (
     });
   };
 };
-// const onLeft = (entry: any) => {
-//   const index = entries.value.findIndex(
-//     (e) => e.id === entry.id,
-//   );
-//   if (index !== -1) {
-//     entries.value[index].amount =
-//       entries.value[index].amount * -1;
-//   }
-// };
 </script>

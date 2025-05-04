@@ -1,5 +1,5 @@
 {
   "$schema": "https://json.schemastore.org/prettierrc",
   "singleQuote": true,
-  "printWidth": 50
+  "printWidth": 100
 }
