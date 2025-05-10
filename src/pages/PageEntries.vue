@@ -3,7 +3,7 @@
     <div class="q-pa-md">
       <q-list bordered padding separator>
         <q-slide-item
-          @right="onEntrySlideRight($event, entry)"
+          @right="handleSwipeToDelete($event, entry)"
           v-for="entry in localEntries"
           :key="entry.id"
           left-color="positive"
@@ -36,7 +36,7 @@
           {{ useCurrencify(balance) }}
         </div>
       </div>
-      <q-form @submit="onAddEntry" class="row q-px-sm q-pb-sm q-col-gutter-sm bg-primary">
+      <q-form @submit="handleAddEntry" class="row q-px-sm q-pb-sm q-col-gutter-sm bg-primary">
         <div class="col">
           <q-input
             placeholder="Nombre del gasto"
@@ -67,141 +67,100 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, reactive, onBeforeUnmount } from 'vue';
+import { ref, computed, reactive } from 'vue';
 import { useCurrencify } from 'src/use/useCurrencify';
 import { useAmountColorClass } from 'src/use/useAmountColorClass';
 import { uid, useQuasar } from 'quasar';
 import { useEntriesStore } from 'src/stores/example-store';
-import { Capacitor } from '@capacitor/core';
-import { Keyboard } from '@capacitor/keyboard';
 
+// 1. Imports y config inicial
 const $q = useQuasar();
-// test class keyboard
-const keyboardOpen = ref(false);
-const keyboardHeight = ref(0);
-
-// store
 const entriesStore = useEntriesStore();
-
-// reactive list from store
-const localEntries = computed(() => entriesStore.entries);
-
 const nameRef = ref<HTMLInputElement | null>(null);
 
-// balance
-const balance = computed(() => {
-  return localEntries.value.reduce((acc, entry) => acc + entry.amount, 0);
-});
-
-// form
-const addEntryDefault = {
+// 2. Estado reactivo
+const addEntryForm = reactive({
   name: '',
   amount: 0,
-};
-
-const addEntryForm = reactive({
-  ...addEntryDefault,
 });
 
+// 3. Computados
+const localEntries = computed(() => entriesStore.entries);
+const balance = computed(() => localEntries.value.reduce((acc, entry) => acc + entry.amount, 0));
+
+// 4. Métodos del formulario
 const resetAddEntryForm = () => {
-  Object.assign(addEntryForm, addEntryDefault);
-  if (nameRef.value) {
-    nameRef.value.focus();
-  }
+  Object.assign(addEntryForm, { name: '', amount: 0 });
+  nameRef.value?.focus();
 };
 
-const onAddEntry = () => {
-  const newEntry = {
+const handleAddEntry = () => {
+  entriesStore.addEntry({
     id: uid(),
     name: addEntryForm.name,
     amount: addEntryForm.amount,
-  };
-
-  entriesStore.addEntry(newEntry);
+  });
   resetAddEntryForm();
 };
 
+// 5. Manejo de eliminación
+const showDeleteConfirmation = (entry: Entry) => {
+  return $q.dialog({
+    title: 'Eliminar gasto',
+    message: createDeleteMessage(entry),
+    persistent: true,
+    html: true,
+    ok: deleteButtonConfig,
+    cancel: cancelButtonConfig,
+  });
+};
+
+const handleDeleteEntry = (entryId: string) => {
+  entriesStore.entries = entriesStore.entries.filter((e) => e.id !== entryId);
+  showDeleteNotification();
+};
+
+const handleSwipeToDelete = ({ reset }: { reset: () => void }, entry: Entry) => {
+  showDeleteConfirmation(entry)
+    .onOk(() => {
+      handleDeleteEntry(entry.id);
+      reset();
+    })
+    .onCancel(reset);
+};
+
+// 6. Helpers y configuraciones
+const deleteButtonConfig = {
+  label: 'Eliminar',
+  color: 'negative',
+  noCaps: true,
+};
+
+const cancelButtonConfig = {
+  label: 'Cancelar',
+  color: 'primary',
+  noCaps: true,
+};
+
+const createDeleteMessage = (entry: Entry) => `
+  ¿Está seguro de eliminar este gasto?
+  <div class="q-mt-md text-weight-bold ${useAmountColorClass(entry.amount)}">
+    ${entry.name} : ${useCurrencify(entry.amount)}
+  </div>
+`;
+
+const showDeleteNotification = () => {
+  $q.notify({
+    type: 'negative',
+    message: 'Gasto eliminado',
+    timeout: 2000,
+  });
+};
+
+// 7. Tipos
 interface Entry {
   id: string;
   name: string;
   amount: number;
 }
-
-const onEntrySlideRight = (
-  {
-    reset,
-  }: {
-    reset: () => void;
-  },
-  entry: Entry,
-) => {
-  $q.dialog({
-    title: 'Eliminar gasto',
-    message: `
-      ¿Está seguro de eliminar este gasto?
-      <div class="q-mt-md text-weight-bold ${useAmountColorClass(entry.amount)}">
-        ${entry.name} : ${useCurrencify(entry.amount)}
-      </div>
-    `,
-    persistent: true,
-    html: true,
-    ok: {
-      label: 'Eliminar',
-      color: 'negative',
-      noCaps: true,
-    },
-    cancel: {
-      label: 'Cancelar',
-      color: 'primary',
-      noCaps: true,
-    },
-  })
-    .onOk(() => {
-      deleteEntry(entry.id);
-      reset();
-    })
-    .onCancel(() => {
-      reset();
-    });
-
-  const deleteEntry = (entryID: string) => {
-    entriesStore.entries = entriesStore.entries.filter((e) => e.id !== entryID);
-    $q.notify({
-      type: 'negative',
-      message: `Gasto eliminado`,
-      timeout: 2000,
-    });
-  };
-};
-
-const handleKeyboardChange = (height: number) => {
-  keyboardHeight.value = height;
-  keyboardOpen.value = height > 0;
-};
-
-if (Capacitor.isNativePlatform()) {
-  // Para iOS y Android con teclado nativo
-  Keyboard.addListener('keyboardWillShow', (info) => {
-    handleKeyboardChange(info.keyboardHeight);
-  }).catch(() => {});
-
-  Keyboard.addListener('keyboardWillHide', () => {
-    handleKeyboardChange(0);
-  }).catch(() => {});
-
-  // Detectar cambios dinámicos de altura (solo Android)
-  if (Capacitor.getPlatform() === 'android') {
-    window.addEventListener('resize', () => {
-      const newHeight = window.innerHeight;
-      const heightDiff = window.screen.height - newHeight;
-      if (heightDiff > 100) handleKeyboardChange(heightDiff);
-    });
-  }
-}
-
-onBeforeUnmount(() => {
-  if (Capacitor.isNativePlatform()) {
-    Keyboard.removeAllListeners().catch(() => {});
-  }
-});
 </script>
