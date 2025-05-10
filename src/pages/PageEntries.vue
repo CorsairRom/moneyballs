@@ -51,11 +51,14 @@
           <q-input
             outlined
             bg-color="white"
-            v-model.number="addEntryForm.amount"
             placeholder="Monto"
             dense
             input-class="text-right"
             type="number"
+            clearable
+            :model-value="addEntryForm.amount?.toString() || ''"
+            @update:model-value="(val) => (addEntryForm.amount = val ? Number(val) : undefined)"
+            :rules="[(val) => (val !== undefined && !isNaN(val)) || 'Ingrese un monto válido']"
           />
         </div>
         <div class="col">
@@ -70,18 +73,22 @@
 import { ref, computed, reactive } from 'vue';
 import { useCurrencify } from 'src/use/useCurrencify';
 import { useAmountColorClass } from 'src/use/useAmountColorClass';
-import { uid, useQuasar } from 'quasar';
+import { useNotifications } from 'src/use/useNotifications';
+import { useDialogs } from 'src/use/useDialogs';
+
+import { uid } from 'quasar';
 import { useEntriesStore } from 'src/stores/example-store';
+import type { Entry } from 'src/models/entryModels';
 
 // 1. Imports y config inicial
-const $q = useQuasar();
 const entriesStore = useEntriesStore();
 const nameRef = ref<HTMLInputElement | null>(null);
-
+const { showNotification } = useNotifications();
+const { showDialog } = useDialogs();
 // 2. Estado reactivo
 const addEntryForm = reactive({
   name: '',
-  amount: 0,
+  amount: undefined as number | undefined,
 });
 
 // 3. Computados
@@ -90,11 +97,21 @@ const balance = computed(() => localEntries.value.reduce((acc, entry) => acc + e
 
 // 4. Métodos del formulario
 const resetAddEntryForm = () => {
-  Object.assign(addEntryForm, { name: '', amount: 0 });
+  addEntryForm.name = '';
+  addEntryForm.amount = undefined;
   nameRef.value?.focus();
 };
 
 const handleAddEntry = () => {
+  if (!addEntryForm.name || addEntryForm.amount === undefined || isNaN(addEntryForm.amount)) {
+    showNotification({
+      type: 'warning',
+      message: 'Complete todos los campos correctamente',
+      timeout: 2000,
+    });
+    return;
+  }
+
   entriesStore.addEntry({
     id: uid(),
     name: addEntryForm.name,
@@ -104,16 +121,6 @@ const handleAddEntry = () => {
 };
 
 // 5. Manejo de eliminación
-const showDeleteConfirmation = (entry: Entry) => {
-  return $q.dialog({
-    title: 'Eliminar gasto',
-    message: createDeleteMessage(entry),
-    persistent: true,
-    html: true,
-    ok: deleteButtonConfig,
-    cancel: cancelButtonConfig,
-  });
-};
 
 const handleDeleteEntry = (entryId: string) => {
   entriesStore.entries = entriesStore.entries.filter((e) => e.id !== entryId);
@@ -121,46 +128,24 @@ const handleDeleteEntry = (entryId: string) => {
 };
 
 const handleSwipeToDelete = ({ reset }: { reset: () => void }, entry: Entry) => {
-  showDeleteConfirmation(entry)
+  showDialog({
+    type: 'confirmation',
+    title: 'Eliminar gasto',
+    message: '¿Está seguro de eliminar este gasto?',
+    entry: entry,
+  })
     .onOk(() => {
       handleDeleteEntry(entry.id);
       reset();
     })
     .onCancel(reset);
 };
-
 // 6. Helpers y configuraciones
-const deleteButtonConfig = {
-  label: 'Eliminar',
-  color: 'negative',
-  noCaps: true,
-};
-
-const cancelButtonConfig = {
-  label: 'Cancelar',
-  color: 'primary',
-  noCaps: true,
-};
-
-const createDeleteMessage = (entry: Entry) => `
-  ¿Está seguro de eliminar este gasto?
-  <div class="q-mt-md text-weight-bold ${useAmountColorClass(entry.amount)}">
-    ${entry.name} : ${useCurrencify(entry.amount)}
-  </div>
-`;
-
 const showDeleteNotification = () => {
-  $q.notify({
-    type: 'negative',
+  showNotification({
+    type: 'error',
     message: 'Gasto eliminado',
     timeout: 2000,
   });
 };
-
-// 7. Tipos
-interface Entry {
-  id: string;
-  name: string;
-  amount: number;
-}
 </script>
