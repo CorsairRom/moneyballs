@@ -1,5 +1,11 @@
 {
   "appId": "com.richard.moneyballs",
   "appName": "Quasar App",
-  "webDir": "www"
+  "webDir": "www",
+  "plugins": {
+    "Keyboard": {
+      "resize": "KeyboardResize.Body",
+      "resizeOnFullScreen": "true"
+    }
+  }
 }

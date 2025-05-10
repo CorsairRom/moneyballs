@@ -67,13 +67,18 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, reactive } from 'vue';
+import { ref, computed, reactive, onBeforeUnmount } from 'vue';
 import { useCurrencify } from 'src/use/useCurrencify';
 import { useAmountColorClass } from 'src/use/useAmountColorClass';
 import { uid, useQuasar } from 'quasar';
 import { useEntriesStore } from 'src/stores/example-store';
+import { Capacitor } from '@capacitor/core';
+import { Keyboard } from '@capacitor/keyboard';
 
 const $q = useQuasar();
+// test class keyboard
+const keyboardOpen = ref(false);
+const keyboardHeight = ref(0);
 
 // store
 const entriesStore = useEntriesStore();
@@ -168,4 +173,35 @@ const onEntrySlideRight = (
     });
   };
 };
+
+const handleKeyboardChange = (height: number) => {
+  keyboardHeight.value = height;
+  keyboardOpen.value = height > 0;
+};
+
+if (Capacitor.isNativePlatform()) {
+  // Para iOS y Android con teclado nativo
+  Keyboard.addListener('keyboardWillShow', (info) => {
+    handleKeyboardChange(info.keyboardHeight);
+  }).catch(() => {});
+
+  Keyboard.addListener('keyboardWillHide', () => {
+    handleKeyboardChange(0);
+  }).catch(() => {});
+
+  // Detectar cambios dinámicos de altura (solo Android)
+  if (Capacitor.getPlatform() === 'android') {
+    window.addEventListener('resize', () => {
+      const newHeight = window.innerHeight;
+      const heightDiff = window.screen.height - newHeight;
+      if (heightDiff > 100) handleKeyboardChange(heightDiff);
+    });
+  }
+}
+
+onBeforeUnmount(() => {
+  if (Capacitor.isNativePlatform()) {
+    Keyboard.removeAllListeners().catch(() => {});
+  }
+});
 </script>
