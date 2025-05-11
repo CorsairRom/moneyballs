@@ -2,14 +2,7 @@
   <q-layout view="hHh lpR lFf">
     <q-header elevated>
       <q-toolbar>
-        <q-btn
-          flat
-          dense
-          round
-          icon="menu"
-          aria-label="Menu"
-          @click="toggleLeftDrawer"
-        />
+        <q-btn flat dense round icon="menu" aria-label="Menu" @click="toggleLeftDrawer" />
 
         <q-toolbar-title>
           <div class="absolute-center">
@@ -29,15 +22,9 @@
       :breakpoint="767"
     >
       <q-list>
-        <q-item-label class="text-white" header>
-          Navigations
-        </q-item-label>
+        <q-item-label class="text-white" header> Navigations </q-item-label>
 
-        <NavLink
-          v-for="link in navLinks"
-          :key="link.title"
-          v-bind="link"
-        />
+        <NavLink v-for="link in navLinks" :key="link.title" v-bind="link" />
       </q-list>
     </q-drawer>
 
@@ -49,9 +36,7 @@
 
 <script setup lang="ts">
 import { ref } from 'vue';
-import NavLink, {
-  type NavLinkProps,
-} from 'components/nav/NavLink.vue';
+import NavLink, { type NavLinkProps } from 'components/nav/NavLink.vue';
 
 const navLinks: NavLinkProps[] = [
   {
@@ -63,6 +48,11 @@ const navLinks: NavLinkProps[] = [
     title: 'Settings',
     icon: 'settings',
     link: '/settings',
+  },
+  {
+    title: 'History',
+    icon: 'history',
+    link: '/history',
   },
 ];
 
