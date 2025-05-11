@@ -1,13 +1,20 @@
 <template>
-  <template>
-    <q-page class="q-pa-md">
-      <div class="text-h5 q-mb-md">Historial Mensual</div>
+  <q-page class="q-pa-md">
+    <div class="text-h5 q-mb-md">Historial Mensual</div>
 
+    <!-- Verificar si hay datos -->
+    <div v-if="sortedMonths.length === 0" class="text-negative">No hay datos disponibles</div>
+
+    <!-- Añadir contenedor para las cards -->
+    <div v-else>
       <q-card v-for="month in sortedMonths" :key="month.monthKey" class="q-mb-sm">
+        <!-- Añadir debug directo en el template -->
+        <div style="display: none">{{ console.log('Month data:', month) }}</div>
+
         <q-card-section>
           <div class="row items-center">
             <div class="col">
-              <div class="text-h6">{{ formatMonth(month.monthKey) }}</div>
+              <div class="text-h6">{{ month.monthKey }} → {{ formatMonth(month.monthKey) }}</div>
               <div class="text-caption">{{ month.entryCount }} transacciones</div>
             </div>
             <div class="col-auto">
@@ -34,8 +41,8 @@
           </q-card-section>
         </q-card-section>
       </q-card>
-    </q-page>
-  </template>
+    </div>
+  </q-page>
 </template>
 
 <script setup lang="ts">

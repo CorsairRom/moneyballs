@@ -62,16 +62,18 @@ export const useMonthlyStore = defineStore('monthly', {
     },
     addMockData() {
       console.log('entrada');
-      this.currentMonthEntries = [];
-      this.archivedMonths = {};
-      // Datos para mes actual
+
+      // 1. Limpiar datos existentes
+      const currentMonth = new Date().toISOString().slice(0, 7);
+
+      // 2. Agregar datos de prueba
       this.currentMonthEntries = [
         { id: '1', name: 'Salario', amount: 2500, date: new Date().toISOString() },
         { id: '2', name: 'Alquiler', amount: -800, date: new Date().toISOString() },
         { id: '3', name: 'Supermercado', amount: -350, date: new Date().toISOString() },
       ];
 
-      // Meses anteriores
+      // 3. Agregar meses anteriores SIN borrar el mes actual
       this.archivedMonths = {
         '2024-04': {
           monthKey: '2024-04',
@@ -89,8 +91,8 @@ export const useMonthlyStore = defineStore('monthly', {
         },
       };
 
-      // Calcular resumen del mes actual
-      this.archiveCurrentMonth();
+      // 4. Archivar mes actual
+      this.archivedMonths[currentMonth] = this.calculateMonthlySummary(currentMonth);
     },
   },
 });
