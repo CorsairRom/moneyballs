@@ -7,18 +7,24 @@
 
     <!-- Añadir contenedor para las cards -->
     <div v-else>
-      <q-card v-for="month in sortedMonths" :key="month.monthKey" class="q-mb-sm">
-        <!-- Añadir debug directo en el template -->
-        <div style="display: none">{{ console.log('Month data:', month) }}</div>
-
+      <q-card
+        v-for="month in sortedMonths"
+        :key="month.monthKey"
+        class="q-mb-sm"
+        appear
+        enter-active-class="animated fadeIn"
+      >
         <q-card-section>
           <div class="row items-center">
             <div class="col">
-              <div class="text-h6">{{ month.monthKey }} → {{ formatMonth(month.monthKey) }}</div>
+              <div class="text-h6">
+                {{ formatMonth(month.monthKey) }}
+                <span class="text-caption text-grey-6">({{ month.monthKey }})</span>
+              </div>
               <div class="text-caption">{{ month.entryCount }} transacciones</div>
             </div>
             <div class="col-auto">
-              <q-badge :color="balanceColor(month.balance)" class="q-pa-sm">
+              <q-badge :color="balanceColor(month.balance)" class="q-pa-sm text-bold">
                 {{ useCurrencify(month.balance) }}
               </q-badge>
             </div>
