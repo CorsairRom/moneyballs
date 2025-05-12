@@ -1,6 +1,9 @@
 <template>
   <q-page class="q-pa-md">
-    <div class="text-h5 q-mb-md">Historial Mensual</div>
+    <div class="q-mb-md text-center">
+      <div class="text-h4 text-weight-bold">Historial Mensual</div>
+      <div class="text-subtitle2 text-grey-6">Lista de gastos por mes</div>
+    </div>
 
     <!-- Verificar si hay datos -->
     <div v-if="sortedMonths.length === 0" class="text-negative">No hay datos disponibles</div>
