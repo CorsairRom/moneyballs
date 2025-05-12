@@ -8,6 +8,7 @@ const routes: RouteRecordRaw[] = [
       { path: '', component: () => import('pages/PageEntries.vue') },
       { path: 'settings', component: () => import('pages/PageSettings.vue') },
       { path: 'history', component: () => import('pages/PageHistory.vue') },
+      { path: 'history/:monthKey', component: () => import('pages/PageMonthDetail.vue') },
     ],
   },
 

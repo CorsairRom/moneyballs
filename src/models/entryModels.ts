@@ -2,7 +2,7 @@ export interface Entry {
   id: string;
   name: string;
   amount: number;
-  date?: string;
+  date: string;
 }
 
 export interface EntryList {

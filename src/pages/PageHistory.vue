@@ -13,6 +13,7 @@
         class="q-mb-sm"
         appear
         enter-active-class="animated fadeIn"
+        @click="viewMonthDetails(month.monthKey)"
       >
         <q-card-section>
           <div class="row items-center">
@@ -24,8 +25,8 @@
               <div class="text-caption">{{ month.entryCount }} transacciones</div>
             </div>
             <div class="col-auto">
-              <q-badge :color="balanceColor(month.balance)" class="q-pa-sm text-bold">
-                {{ useCurrencify(month.balance) }}
+              <q-badge :color="balanceColor(month.monthyBalance)" class="q-pa-sm text-bold">
+                {{ useCurrencify(month.monthyBalance) }}
               </q-badge>
             </div>
           </div>
@@ -56,28 +57,35 @@ import { useMonthlyStore } from 'src/stores/monthlyStore';
 import { useCurrencify } from 'src/use/useCurrencify';
 // import { useAmountColorClass } from 'src/use/useAmountColorClass';
 import { computed } from 'vue';
-// import { useRouter } from 'vue-router';
+import { useRouter } from 'vue-router';
 
 const store = useMonthlyStore();
-// const router = useRouter();
+const router = useRouter();
 
 // Inicializar el store al montar el componente
-store.initializeMonth();
+// store.initializeMonth();
 
 // Condición corregida para detectar falta de datos
 if (Object.keys(store.archivedMonths).length < 2) {
-  // Si hay menos de 2 meses
   console.warn('Cargando datos de prueba...');
   store.addMockData();
 }
 
+// Obtener el mes actual
+// const currentMonth = new Date().toISOString().slice(0, 7);
+
+// Obtener datos del mes actual usando el nuevo getter
+// const monthlyData = computed(() => store.getMonthlyData(currentMonth));
+
+// Obtener meses ordenados
 const sortedMonths = computed(() =>
   Object.values(store.archivedMonths).sort((a, b) => b.monthKey.localeCompare(a.monthKey)),
 );
 
 const formatMonth = (monthKey: string) => {
   const [year, month] = monthKey.split('-');
-  return new Date(`${year}-${month}-01`)
+  if (!year || !month) return '';
+  return new Date(Date.UTC(+year, +month, 1))
     .toLocaleDateString('es-ES', {
       year: 'numeric',
       month: 'long',
@@ -87,7 +95,7 @@ const formatMonth = (monthKey: string) => {
 
 const balanceColor = (balance: number) => (balance >= 0 ? 'positive' : 'negative');
 
-// const viewMonthDetails = (monthKey: string) => {
-//   router.push(`/history/${monthKey}`);
-// };
+const viewMonthDetails = async (monthKey: string) => {
+  await router.push(`/history/${monthKey}`);
+};
 </script>

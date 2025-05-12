@@ -116,6 +116,7 @@ const handleAddEntry = () => {
     id: uid(),
     name: addEntryForm.name,
     amount: addEntryForm.amount,
+    date: new Date().toISOString(),
   });
   resetAddEntryForm();
 };

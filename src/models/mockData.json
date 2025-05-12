@@ -1,0 +1,94 @@
+[
+    {
+        "monthKey": "2025-01",
+        "entries": [
+            {
+                "id": "1",
+                "name": "Salario",
+                "amount": 2500,
+                "date": "2025-01-15T01:04:31.227Z"
+            },
+            {
+                "id": "2",
+                "name": "Alquiler",
+                "amount": -2800,
+                "date": "2025-01-05T01:04:31.227Z"
+            },
+            {
+                "id": "3",
+                "name": "Supermercado",
+                "amount": -350,
+                "date": "2025-01-20T01:04:31.227Z"
+            }
+        ]
+    },
+    {
+        "monthKey": "2025-02",
+        "entries": [
+            {
+                "id": "4",
+                "name": "Salario",
+                "amount": 2600,
+                "date": "2025-02-15T01:04:31.227Z"
+            },
+            {
+                "id": "5",
+                "name": "Alquiler",
+                "amount": -800,
+                "date": "2025-02-05T01:04:31.227Z"
+            },
+            {
+                "id": "6",
+                "name": "Transporte",
+                "amount": -150,
+                "date": "2025-02-10T01:04:31.227Z"
+            }
+        ]
+    },
+    {
+        "monthKey": "2025-03",
+        "entries": [
+            {
+                "id": "7",
+                "name": "Salario",
+                "amount": 2700,
+                "date": "2025-03-15T01:04:31.227Z"
+            },
+            {
+                "id": "8",
+                "name": "Alquiler",
+                "amount": -800,
+                "date": "2025-03-05T01:04:31.227Z"
+            },
+            {
+                "id": "9",
+                "name": "Comida",
+                "amount": -400,
+                "date": "2025-03-20T01:04:31.227Z"
+            }
+        ]
+    },
+    {
+        "monthKey": "2025-04",
+        "entries": [
+            {
+                "id": "10",
+                "name": "Salario",
+                "amount": 2800,
+                "date": "2025-04-15T01:04:31.227Z"
+            },
+            {
+                "id": "11",
+                "name": "Alquiler",
+                "amount": -800,
+                "date": "2025-04-05T01:04:31.227Z"
+            },
+            {
+                "id": "12",
+                "name": "Entretenimiento",
+                "amount": -200,
+                "date": "2025-04-25T01:04:31.227Z"
+            }
+        ]
+    }
+]
