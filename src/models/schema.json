@@ -1,0 +1,20 @@
+{
+    "monthKey": "2024-03",
+    "income": 2500,
+    "expenses": 500,
+    "balance": 2000,
+    "entries": [
+        {
+            "id": "1",
+            "name": "Salario",
+            "amount": 2500,
+            "date": "2025-05-11T01:04:31.227Z"
+        },
+        {
+            "id": "2",
+            "name": "Gasto2",
+            "amount": -500,
+            "date": "2025-05-11T01:04:31.227Z"
+        }
+    ]
+}
