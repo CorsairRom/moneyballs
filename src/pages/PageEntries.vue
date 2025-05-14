@@ -1,5 +1,9 @@
 <template>
   <q-page>
+    <div class="q-mb-md q-mt-md text-center">
+      <div class="text-h4 text-weight-bold">Registro Mensuales</div>
+      <div class="text-subtitle2 text-grey-6">Gastos y Aportes</div>
+    </div>
     <div class="q-pa-md">
       <q-list bordered padding separator>
         <q-slide-item
@@ -70,7 +74,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, reactive } from 'vue';
+import { ref, computed, reactive, onMounted } from 'vue';
 import { useCurrencify } from 'src/use/useCurrencify';
 import { useAmountColorClass } from 'src/use/useAmountColorClass';
 import { useNotifications } from 'src/use/useNotifications';
@@ -79,9 +83,11 @@ import { useDialogs } from 'src/use/useDialogs';
 import { uid } from 'quasar';
 import { useEntriesStore } from 'src/stores/example-store';
 import type { Entry } from 'src/models/entryModels';
+import { useSettingStore } from 'src/stores/settingStore';
 
 // 1. Imports y config inicial
 const entriesStore = useEntriesStore();
+const settingStore = useSettingStore();
 const nameRef = ref<HTMLInputElement | null>(null);
 const { showNotification } = useNotifications();
 const { showDialog } = useDialogs();
@@ -90,7 +96,6 @@ const addEntryForm = reactive({
   name: '',
   amount: undefined as number | undefined,
 });
-
 // 3. Computados
 const localEntries = computed(() => entriesStore.entries);
 const balance = computed(() => localEntries.value.reduce((acc, entry) => acc + entry.amount, 0));
@@ -149,4 +154,20 @@ const showDeleteNotification = () => {
     timeout: 2000,
   });
 };
+
+onMounted(() => {
+  const initialSalary = settingStore.getInitialSalary;
+
+  // Evitar duplicados: verificar si ya existe una entrada "Salario inicial"
+  const exists = entriesStore.entries.some((e) => e.name === 'Salario inicial');
+
+  if (initialSalary > 0 && !exists) {
+    entriesStore.addEntry({
+      id: uid(),
+      name: 'Salario inicial',
+      amount: initialSalary,
+      date: new Date().toISOString(),
+    });
+  }
+});
 </script>

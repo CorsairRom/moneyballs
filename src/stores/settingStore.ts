@@ -9,8 +9,8 @@ type SettingData = {
 export const useSettingStore = defineStore('setting', {
   state: () => ({
     settings: {
-      dayEndMonth: 4,
-      initialSalary: 1600000,
+      dayEndMonth: 1,
+      initialSalary: 0,
     } as SettingData,
   }),
 
@@ -24,6 +24,13 @@ export const useSettingStore = defineStore('setting', {
   actions: {
     updateSettings(newSettings: Partial<SettingData>) {
       this.settings = { ...this.settings, ...newSettings };
+    },
+
+    setDayEndMonth(day: number) {
+      this.settings.dayEndMonth = day;
+    },
+    setInitialSalary(salary: number) {
+      this.settings.initialSalary = salary;
     },
 
     shouldInitializeMonth(currentDay: number): boolean {

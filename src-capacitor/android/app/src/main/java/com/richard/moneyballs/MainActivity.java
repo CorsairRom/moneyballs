@@ -1,4 +1,4 @@
-package com.richard.moneyballs;
+package com.richard.antstop;
 
 import com.getcapacitor.BridgeActivity;
 
