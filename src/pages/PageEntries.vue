@@ -40,7 +40,7 @@
           {{ useCurrencify(balance) }}
         </div>
       </div>
-      <q-form @submit="handleAddEntry" class="row q-px-sm q-pb-sm q-col-gutter-sm bg-primary">
+      <q-form @submit.prevent class="row q-px-sm q-pb-sm q-col-gutter-sm bg-primary">
         <div class="col">
           <q-input
             placeholder="Nombre del gasto"
@@ -61,12 +61,28 @@
             type="number"
             clearable
             :model-value="addEntryForm.amount?.toString() || ''"
-            @update:model-value="(val) => (addEntryForm.amount = val ? Number(val) : undefined)"
+            @update:model-value="
+              (val) => (addEntryForm.amount = val ? Math.abs(Number(val)) : undefined)
+            "
             :rules="[(val) => (val !== undefined && !isNaN(val)) || 'Ingrese un monto válido']"
           />
         </div>
-        <div class="col">
-          <q-btn type="submit" round color="primary" icon="add" />
+        <div class="col-auto">
+          <q-btn
+            type="button"
+            round
+            color="positive"
+            icon="add"
+            @click="handleAddEntry(true)"
+            class="q-mr-sm"
+          />
+          <q-btn
+            type="button"
+            round
+            color="negative"
+            icon="remove"
+            @click="handleAddEntry(false)"
+          />
         </div>
       </q-form>
     </q-footer>
@@ -107,7 +123,7 @@ const resetAddEntryForm = () => {
   nameRef.value?.focus();
 };
 
-const handleAddEntry = () => {
+const handleAddEntry = (isPositive: boolean = true) => {
   if (!addEntryForm.name || addEntryForm.amount === undefined || isNaN(addEntryForm.amount)) {
     showNotification({
       type: 'warning',
@@ -117,10 +133,12 @@ const handleAddEntry = () => {
     return;
   }
 
+  const amount = isPositive ? addEntryForm.amount : -addEntryForm.amount;
+
   entriesStore.addEntry({
     id: uid(),
     name: addEntryForm.name,
-    amount: addEntryForm.amount,
+    amount: amount,
     date: new Date().toISOString(),
   });
   resetAddEntryForm();
