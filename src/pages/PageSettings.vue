@@ -2,7 +2,11 @@
   <div class="q-pa-md">
     <div class="q-mb-md text-center">
       <div class="text-h4 text-weight-bold">Configuraciones</div>
-      <div class="text-subtitle2 text-grey-6">----</div>
+      <div class="text-subtitle2 text-grey-6">
+        <q-btn color="deep-orange" glossy label="Cargar Data" @click="loadData" />
+        <q-btn color="amber" glossy label="Cargar Gastos" @click="loadBills" />
+        <q-btn color="black" glossy label="Limpiar" @click="cleanData" />
+      </div>
     </div>
     <q-toolbar class="bg-primary text-white shadow-2">
       <q-toolbar-title>Configuración Inicial</q-toolbar-title>
@@ -56,25 +60,34 @@
     </q-toolbar>
 
     <q-list bordered padding>
-      <q-item v-for="expense in fixedExpenses" :key="expense.id">
-        <q-item-section>
-          <q-item-label>{{ expense.name }}</q-item-label>
-          <q-item-label caption>
-            {{ useCurrencify(expense.amount) }} -
-            {{ getDurationLabel(expense.duration) }}
-          </q-item-label>
-        </q-item-section>
-        <q-item-section side>
-          <q-btn
-            flat
-            round
-            dense
-            icon="delete"
-            color="negative"
-            @click="deleteExpense(expense.id)"
-          />
-        </q-item-section>
-      </q-item>
+      <template v-if="fixedExpenses.length">
+        <q-item v-for="expense in fixedExpenses" :key="expense.id">
+          <q-item-section>
+            <q-item-label>{{ expense.name }}</q-item-label>
+            <q-item-label caption>
+              {{ useCurrencify(expense.amount) }} -
+              {{ getDurationLabel(expense.duration) }}
+            </q-item-label>
+          </q-item-section>
+          <q-item-section side>
+            <q-btn
+              flat
+              round
+              dense
+              icon="delete"
+              color="negative"
+              @click="deleteExpense(expense.id)"
+            />
+          </q-item-section>
+        </q-item>
+      </template>
+      <template v-else>
+        <EmptyState
+          icon="payments"
+          title="No hay gastos fijos"
+          subtitle="Agrega gastos fijos usando el botón +"
+        />
+      </template>
     </q-list>
 
     <!-- Dialog para agregar gasto fijo -->
@@ -112,7 +125,8 @@ import { ref, computed, onMounted } from 'vue';
 import { uid } from 'quasar';
 import { useSettingStore } from 'src/stores/settingStore';
 import { useCurrencify } from 'src/use/useCurrencify';
-import type { FixedExpense, DurationType } from 'src/models/fixedExpenseModel';
+import type { DurationType } from 'src/models/fixedExpenseModel';
+import EmptyState from 'src/components/EmptyState.vue';
 
 const settingStore = useSettingStore();
 
@@ -167,21 +181,21 @@ onMounted(() => {
 // También podrías usar watchEffect para autoactualizar en tiempo real:
 // watchEffect(() => {
 //   if (!formLocked.value && dayEndMonth.value != null && salaryInitial.value != null) {
-//     settingStore.updateSettings({
-//       dayEndMonth: dayEndMonth.value,
+//     settingStore.updateSettings({fixedExpenses
 //       initialSalary: salaryInitial.value,
 //     });
 //   }
 // });
 
 const showAddExpenseDialog = ref(false);
-const fixedExpenses = ref<FixedExpense[]>([]);
+// const fixedExpenses = ref<FixedExpense[]>([]);
+const fixedExpenses = computed(() => settingStore.getFixedExpenses);
 
 const durationOptions = [
-  { label: 'Permanente', value: 'fixed' },
-  { label: '1 mes', value: '1' },
-  { label: '3 meses', value: '3' },
-  { label: '6 meses', value: '6' },
+  { label: 'Permanenite', value: 'fixed' },
+  { label: '1 mes', value: 1 },
+  { label: '3 meses', value: 3 },
+  { label: '6 meses', value: 6 },
 ] as const;
 
 const newExpense = ref({
@@ -194,24 +208,24 @@ const getDurationLabel = (duration: DurationType): string => {
   switch (duration) {
     case 'fixed':
       return 'Permanente';
-    case '1':
+    case 1:
       return '1 mes';
-    case '3':
+    case 3:
       return '3 meses';
-    case '6':
+    case 6:
       return '6 meses';
     default:
       return '';
   }
 };
 
-function addExpense() {
+const addExpense = () => {
   if (!newExpense.value.name || !newExpense.value.amount) return;
 
   // Usamos directamente el valor de duration ya que siempre es string
   const durationValue = newExpense.value.duration;
 
-  fixedExpenses.value.push({
+  settingStore.addFixedExpense({
     id: uid(),
     name: newExpense.value.name,
     amount: newExpense.value.amount,
@@ -225,9 +239,20 @@ function addExpense() {
     amount: 0,
     duration: 'fixed',
   };
-}
+};
 
-function deleteExpense(id: string) {
-  fixedExpenses.value = fixedExpenses.value.filter((expense) => expense.id !== id);
-}
+const deleteExpense = (id: string) => {
+  settingStore.removeFixedExpense(id);
+};
+
+const loadData = () => {
+  settingStore.setMockData('all');
+};
+const loadBills = () => {
+  settingStore.setMockData('bills');
+};
+
+const cleanData = () => {
+  settingStore.removeAllData();
+};
 </script>

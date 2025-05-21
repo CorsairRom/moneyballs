@@ -2,7 +2,7 @@ import { defineStore } from 'pinia';
 import type { Entry } from 'src/models/entryModels';
 import { acceptHMRUpdate } from 'pinia';
 import mockData from 'src/models/mockData.json'; // Asegúrate de que la ruta sea correcta
-import { useEntriesStore } from 'src/stores/example-store';
+import { useEntriesStore } from 'src/stores/EntryStore';
 import { useSettingStore } from 'src/stores/settingStore';
 type historyMonthyData = {
   monthKey: string;

@@ -3,35 +3,46 @@
     <div class="q-mb-md q-mt-md text-center">
       <div class="text-h4 text-weight-bold">Registro Mensuales</div>
       <div class="text-subtitle2 text-grey-6">Gastos y Aportes</div>
+      <div class="text-subtitle2 text-grey-6">
+        <q-btn color="deep-orange" glossy label="Eliminar Data" @click="deleteAllEntries" />
+      </div>
     </div>
     <div class="q-pa-md">
-      <q-list bordered padding separator>
-        <q-slide-item
-          @right="handleSwipeToDelete($event, entry)"
-          v-for="entry in localEntries"
-          :key="entry.id"
-          left-color="positive"
-          right-color="negative"
-        >
-          <template v-slot:right>
-            <q-icon name="delete" />
-          </template>
+      <template v-if="localEntries.length > 0">
+        <q-list bordered padding separator>
+          <q-slide-item
+            @right="handleSwipeToDelete($event, entry)"
+            v-for="entry in localEntries"
+            :key="entry.id"
+            left-color="positive"
+            right-color="negative"
+          >
+            <template v-slot:right>
+              <q-icon name="delete" />
+            </template>
 
-          <q-item>
-            <q-item-section class="text-weight-bold" :class="useAmountColorClass(entry.amount)">
-              {{ entry.name }}
-            </q-item-section>
+            <q-item>
+              <q-item-section class="text-weight-bold" :class="useAmountColorClass(entry.amount)">
+                {{ entry.name }}
+              </q-item-section>
 
-            <q-item-section
-              side
-              class="text-weight-bold"
-              :class="useAmountColorClass(entry.amount)"
-            >
-              {{ useCurrencify(entry.amount) }}
-            </q-item-section>
-          </q-item>
-        </q-slide-item>
-      </q-list>
+              <q-item-section
+                side
+                class="text-weight-bold"
+                :class="useAmountColorClass(entry.amount)"
+              >
+                {{ useCurrencify(entry.amount) }}
+              </q-item-section>
+            </q-item>
+          </q-slide-item>
+        </q-list>
+      </template>
+      <template v-else>
+        <EmptyState
+          title="No hay registros"
+          subtitle="Agrega gastos o ingresos usando el formulario inferior"
+        />
+      </template>
     </div>
     <q-footer class="bg-transparent">
       <div class="row q-mb-sm q-px-md q-py-sm shadow-up-3">
@@ -97,10 +108,10 @@ import { useNotifications } from 'src/use/useNotifications';
 import { useDialogs } from 'src/use/useDialogs';
 
 import { uid } from 'quasar';
-import { useEntriesStore } from 'src/stores/example-store';
+import { useEntriesStore } from 'src/stores/EntryStore';
 import type { Entry } from 'src/models/entryModels';
 import { useSettingStore } from 'src/stores/settingStore';
-
+import EmptyState from 'src/components/EmptyState.vue';
 // 1. Imports y config inicial
 const entriesStore = useEntriesStore();
 const settingStore = useSettingStore();
@@ -175,11 +186,12 @@ const showDeleteNotification = () => {
 
 onMounted(() => {
   const initialSalary = settingStore.getInitialSalary;
+  const bills = settingStore.getFixedExpenses;
 
-  // Evitar duplicados: verificar si ya existe una entrada "Salario inicial"
-  const exists = entriesStore.entries.some((e) => e.name === 'Salario inicial');
+  // Verificar salario inicial
+  const salaryExists = entriesStore.entries.some((e) => e.name === 'Salario inicial');
 
-  if (initialSalary > 0 && !exists) {
+  if (initialSalary > 0 && !salaryExists) {
     entriesStore.addEntry({
       id: uid(),
       name: 'Salario inicial',
@@ -187,5 +199,39 @@ onMounted(() => {
       date: new Date().toISOString(),
     });
   }
+
+  // Verificar gastos fijos
+  if (bills.length > 0) {
+    bills.forEach((bill) => {
+      // Verificar si el gasto ya existe para la fecha actual
+      const today = new Date().toISOString().split('T')[0]; // Obtener solo la fecha
+      const billExists = entriesStore.entries.some(
+        (e) => e.name === bill.name && e.date.split('T')[0] === today && e.amount === -bill.amount,
+      );
+
+      if (!billExists) {
+        entriesStore.addEntry({
+          id: uid(),
+          name: bill.name,
+          amount: -bill.amount,
+          date: new Date().toISOString(),
+        });
+      }
+    });
+  }
 });
+const deleteAllEntries = () => {
+  showDialog({
+    type: 'confirmation',
+    title: 'Eliminar todos los gastos',
+    message: '¿Está seguro de eliminar todos los gastos?',
+  }).onOk(() => {
+    entriesStore.entries = [];
+    showNotification({
+      type: 'error',
+      message: 'Todos los gastos eliminados',
+      timeout: 2000,
+    });
+  });
+};
 </script>
