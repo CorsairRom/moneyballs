@@ -4,7 +4,7 @@ import type { FixedExpense } from 'src/models/fixedExpenseModel';
 
 type SettingData = {
   dayEndMonth: number;
-  initialSalary: number;
+  initialSalary: number | undefined;
   fixedExpenses: FixedExpense[];
 };
 
@@ -12,7 +12,7 @@ export const useSettingStore = defineStore('setting', {
   state: () => ({
     settings: {
       dayEndMonth: 1,
-      initialSalary: 0,
+      initialSalary: undefined,
       fixedExpenses: [],
     } as SettingData,
   }),
@@ -70,7 +70,7 @@ export const useSettingStore = defineStore('setting', {
     removeAllData() {
       this.settings = {
         dayEndMonth: 1,
-        initialSalary: 0,
+        initialSalary: undefined,
         fixedExpenses: [],
       };
     },

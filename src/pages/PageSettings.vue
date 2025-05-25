@@ -30,14 +30,10 @@
 
         <q-item>
           <q-item-section>
-            <q-input
-              outlined
+            <MoneyInput
+              v-model="salaryInitial"
               label="Monto inicial del mes"
-              :model-value="salaryFormatted"
-              @update:model-value="onSalaryInput"
-              @keypress="onlyAllowNumbers"
-              type="text"
-              :disable="formLocked"
+              :disabled="formLocked"
             />
           </q-item-section>
         </q-item>
@@ -98,9 +94,10 @@
         </q-card-section>
 
         <q-card-section class="q-pt-none">
-          <q-input v-model="newExpense.name" label="Nombre" dense />
-          <q-input v-model="newExpense.amount" label="Monto" type="number" dense class="q-mt-sm" />
+          <q-input outlined v-model="newExpense.name" label="Nombre" dense />
+          <MoneyInput v-model="newExpense.amount" label="Monto" :disabled="false" class="q-mt-sm" />
           <q-select
+            outlined
             v-model="newExpense.duration"
             :options="durationOptions"
             label="Duración"
@@ -127,31 +124,11 @@ import { useSettingStore } from 'src/stores/settingStore';
 import { useCurrencify } from 'src/use/useCurrencify';
 import type { DurationType } from 'src/models/fixedExpenseModel';
 import EmptyState from 'src/components/EmptyState.vue';
-
+import MoneyInput from 'src/components/MoneyInput.vue';
 const settingStore = useSettingStore();
 
 const dayEndMonth = ref<number | undefined>();
 const salaryInitial = ref<number | undefined>();
-
-const salaryFormatted = computed(() => {
-  return new Intl.NumberFormat('es-CL', {
-    style: 'currency',
-    currency: 'CLP',
-    maximumFractionDigits: 0,
-  }).format(salaryInitial.value || 0);
-});
-
-function onSalaryInput(value: string | number | null) {
-  const clean = String(value ?? '').replace(/\D/g, '');
-  salaryInitial.value = Number(clean || '0');
-}
-
-function onlyAllowNumbers(e: KeyboardEvent) {
-  const allowedKeys = ['Backspace', 'ArrowLeft', 'ArrowRight', 'Delete', 'Tab'];
-  if (!/^\d$/.test(e.key) && !allowedKeys.includes(e.key)) {
-    e.preventDefault();
-  }
-}
 
 function submitInitialSettings() {
   if (dayEndMonth.value == null || salaryInitial.value == null) {
@@ -192,7 +169,7 @@ const showAddExpenseDialog = ref(false);
 const fixedExpenses = computed(() => settingStore.getFixedExpenses);
 
 const durationOptions = [
-  { label: 'Permanenite', value: 'fixed' },
+  { label: 'Permanente', value: 'fixed' },
   { label: '1 mes', value: 1 },
   { label: '3 meses', value: 3 },
   { label: '6 meses', value: 6 },

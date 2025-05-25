@@ -191,7 +191,7 @@ onMounted(() => {
   // Verificar salario inicial
   const salaryExists = entriesStore.entries.some((e) => e.name === 'Salario inicial');
 
-  if (initialSalary > 0 && !salaryExists) {
+  if (initialSalary && !salaryExists) {
     entriesStore.addEntry({
       id: uid(),
       name: 'Salario inicial',
