@@ -3,9 +3,7 @@
     <div class="q-mb-md text-center">
       <div class="text-h4 text-weight-bold">Configuraciones</div>
       <div class="text-subtitle2 text-grey-6">
-        <q-btn color="deep-orange" glossy label="Cargar Data" @click="loadData" />
-        <q-btn color="amber" glossy label="Cargar Gastos" @click="loadBills" />
-        <q-btn color="black" glossy label="Limpiar" @click="cleanData" />
+        Aquí puedes configurar los ajustes iniciales de tu aplicación y agregar gastos fijos.
       </div>
     </div>
     <q-toolbar class="bg-primary text-white shadow-2">
@@ -220,16 +218,5 @@ const addExpense = () => {
 
 const deleteExpense = (id: string) => {
   settingStore.removeFixedExpense(id);
-};
-
-const loadData = () => {
-  settingStore.setMockData('all');
-};
-const loadBills = () => {
-  settingStore.setMockData('bills');
-};
-
-const cleanData = () => {
-  settingStore.removeAllData();
 };
 </script>

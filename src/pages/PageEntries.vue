@@ -3,9 +3,7 @@
     <div class="q-mb-md q-mt-md text-center">
       <div class="text-h4 text-weight-bold">Registro Mensuales</div>
       <div class="text-subtitle2 text-grey-6">Gastos y Aportes</div>
-      <div class="text-subtitle2 text-grey-6">
-        <q-btn color="deep-orange" glossy label="Eliminar Data" @click="deleteAllEntries" />
-      </div>
+      <div class="text-subtitle2 text-grey-6"></div>
     </div>
     <div class="q-pa-md">
       <template v-if="localEntries.length > 0">
@@ -220,18 +218,4 @@ onMounted(() => {
     });
   }
 });
-const deleteAllEntries = () => {
-  showDialog({
-    type: 'confirmation',
-    title: 'Eliminar todos los gastos',
-    message: '¿Está seguro de eliminar todos los gastos?',
-  }).onOk(() => {
-    entriesStore.entries = [];
-    showNotification({
-      type: 'error',
-      message: 'Todos los gastos eliminados',
-      timeout: 2000,
-    });
-  });
-};
 </script>
