@@ -1,10 +1,10 @@
 apply plugin: 'com.android.application'
 
 android {
-    namespace "com.richard.moneyballs"
+    namespace "com.richard.antstop"
     compileSdk rootProject.ext.compileSdkVersion
     defaultConfig {
-        applicationId "com.richard.moneyballs"
+        applicationId "com.richard.antstop"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
         versionCode 1

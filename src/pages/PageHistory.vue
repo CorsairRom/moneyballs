@@ -6,8 +6,32 @@
     </div>
 
     <!-- Verificar si hay datos -->
-    <div v-if="sortedMonths.length === 0" class="text-negative">No hay datos disponibles</div>
+    <div v-if="sortedMonths.length === 0" class="flex flex-center">
+      <q-card class="text-center q-pa-lg" style="max-width: 400px">
+        <q-card-section>
+          <q-avatar size="100px" color="primary" text-color="white">
+            <q-icon name="history" size="70px" />
+          </q-avatar>
+        </q-card-section>
 
+        <q-card-section>
+          <div class="text-h6">No hay historial disponible</div>
+          <div class="text-grey-8 q-mt-sm">
+            Aún no se han registrado transacciones. Los datos históricos aparecerán aquí una vez que
+            comiences a registrar tus gastos e ingresos.
+          </div>
+        </q-card-section>
+
+        <q-card-actions vertical align="center">
+          <q-btn
+            color="primary"
+            icon="add"
+            label="Registrar transacción"
+            @click="$router.push('/')"
+          />
+        </q-card-actions>
+      </q-card>
+    </div>
     <!-- Añadir contenedor para las cards -->
     <div v-else>
       <q-card
@@ -58,7 +82,6 @@
 <script setup lang="ts">
 import { useMonthlyStore } from 'src/stores/monthlyStore';
 import { useCurrencify } from 'src/use/useCurrencify';
-// import { useAmountColorClass } from 'src/use/useAmountColorClass';
 import { computed } from 'vue';
 import { useRouter } from 'vue-router';
 
@@ -71,7 +94,6 @@ const router = useRouter();
 // Condición corregida para detectar falta de datos
 if (Object.keys(store.archivedMonths).length < 2) {
   console.warn('Cargando datos de prueba...');
-  store.addMockData();
 }
 
 // Obtener el mes actual

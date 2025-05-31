@@ -7,7 +7,7 @@
         <q-toolbar-title>
           <div class="absolute-center">
             <q-icon name="savings" />
-            MoneyBalls
+            AntStop
           </div>
         </q-toolbar-title>
       </q-toolbar>
@@ -22,7 +22,7 @@
       :breakpoint="767"
     >
       <q-list>
-        <q-item-label class="text-white" header> Navigations </q-item-label>
+        <q-item-label class="text-white" header> Menus </q-item-label>
 
         <NavLink v-for="link in navLinks" :key="link.title" v-bind="link" />
       </q-list>
@@ -40,17 +40,17 @@ import NavLink, { type NavLinkProps } from 'components/nav/NavLink.vue';
 
 const navLinks: NavLinkProps[] = [
   {
-    title: 'Entries',
-    icon: 'savings',
+    title: 'Entradas',
+    icon: 'point_of_sale',
     link: '/',
   },
   {
-    title: 'Settings',
+    title: 'Configuraciones',
     icon: 'settings',
     link: '/settings',
   },
   {
-    title: 'History',
+    title: 'Historial',
     icon: 'history',
     link: '/history',
   },

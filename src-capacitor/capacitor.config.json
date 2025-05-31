@@ -1,11 +1,17 @@
 {
-  "appId": "com.richard.moneyballs",
-  "appName": "Quasar App",
+  "appId": "com.richard.antstop",
+  "appName": "Antstop",
   "webDir": "www",
   "plugins": {
+    "StatusBar": {
+      "style": "dark",
+      "backgroundColor": "#33000000",
+      "overlaysWebView": true,
+      "androidEnforceOptOut": true
+    },
     "Keyboard": {
-      "resize": "KeyboardResize.Body",
-      "resizeOnFullScreen": "true"
+      "resize": "body",
+      "resizeOnFullScreen": true
     }
   }
 }

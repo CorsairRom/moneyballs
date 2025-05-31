@@ -1,8 +1,8 @@
 {
-  "name": "moneyballs",
+  "name": "antstop",
   "version": "0.0.1",
   "description": "app to control expenses",
-  "productName": "Quasar App",
+  "productName": "Antstop",
   "author": "rromero <rromero@heligrafics.net>",
   "type": "module",
   "private": true,
@@ -17,6 +17,7 @@
   "dependencies": {
     "@capacitor/core": "^7.2.0",
     "@capacitor/keyboard": "^7.0.1",
+    "@capacitor/status-bar": "^7.0.1",
     "@quasar/extras": "^1.16.4",
     "axios": "^1.2.1",
     "pinia": "^3.0.1",
