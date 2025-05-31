@@ -2,7 +2,7 @@
   "name": "antstop",
   "version": "0.0.1",
   "description": "app to control expenses",
-  "productName": "Quasar App",
+  "productName": "Antstop",
   "author": "rromero <rromero@heligrafics.net>",
   "type": "module",
   "private": true,

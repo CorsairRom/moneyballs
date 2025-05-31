@@ -1,6 +1,6 @@
 {
   "appId": "com.richard.antstop",
-  "appName": "Quasar App",
+  "appName": "Antstop",
   "webDir": "www",
   "plugins": {
     "StatusBar": {
